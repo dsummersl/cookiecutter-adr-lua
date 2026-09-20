@@ -1,0 +1,6 @@
+lua_modules/
+.luals/
+
+# Coverage / test
+luacov.stats.out
+luacov.report.out

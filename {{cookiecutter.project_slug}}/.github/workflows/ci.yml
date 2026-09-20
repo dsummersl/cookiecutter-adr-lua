@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Lua
+        uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "luajit"
+
+      - name: Set up LuaRocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: Install stylua, selene, ast-grep
+        run: cargo binstall -y stylua selene ast-grep
+
+      - name: Install lua-language-server
+        run: |
+          mkdir -p "$HOME/luals"
+          curl -sL "$(curl -s https://api.github.com/repos/LuaLS/lua-language-server/releases/latest | jq -r '.assets[] | select(.name | endswith("linux-x64.tar.gz")) | .browser_download_url')" | tar -xz -C "$HOME/luals"
+          echo "$HOME/luals/bin" >> "$GITHUB_PATH"
+
+      - name: Setup
+        run: make setup
+
+      - name: CI
+        run: make ci
+
+      - name: Upload code coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: luacov.report.out
+          if-no-files-found: ignore
