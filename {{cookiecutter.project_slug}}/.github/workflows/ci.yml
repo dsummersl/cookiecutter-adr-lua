@@ -17,13 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Lua
-        uses: leafo/gh-actions-lua@v10
-        with:
-          luaVersion: "luajit"
-
-      - name: Set up LuaRocks
-        uses: leafo/gh-actions-luarocks@v4
+      - name: Install Lua and LuaRocks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luajit luarocks
 
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@main
