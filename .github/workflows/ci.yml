@@ -29,6 +29,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y luajit luarocks
+          mkdir -p "$HOME/.luarocks"
+          luarocks config --scope user lua_interpreter luajit
 
       - name: Install cargo-binstall
         uses: cargo-bins/cargo-binstall@main
